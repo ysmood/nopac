@@ -1,3 +1,5 @@
+fs = require 'fs'
+
 ###
     Nopac
 ###
@@ -16,9 +18,11 @@ module.exports = class Nopac then constructor: ->
 			ego.init_server()
 
 		init_options: ->
-			config_path = __dirname + '/config.example'
+			config_path = require.resolve __dirname + '/../config'
+			if not fs.existsSync(config_path)
+				config_path = require.resolve(__dirname + '/config.example')
 			ego.opts = require config_path
-			ego.opts.config_path = require.resolve config_path
+			ego.opts.config_path = config_path
 
 			commander = require 'commander'
 			commander
@@ -52,8 +56,6 @@ module.exports = class Nopac then constructor: ->
 			defaults commander
 
 		setup: ->
-			fs = require 'fs'
-
 			dist_path = __dirname + '/../config.coffee'
 
 			if fs.existsSync(dist_path)
@@ -77,15 +79,30 @@ module.exports = class Nopac then constructor: ->
 				if curr.mtime != prev.mtime
 					delete require.cache[ego.opts.config_path]
 					opts = require ego.opts.config_path
-					ego.opts.pac = opts.pac
+
+					for k, v of opts
+						ego.opts[k] = v
+
 					ego.log 'Config reloaded.'
+			ego.log 'Watch: ' + ego.opts.config_path
 
 		pac_handler: (req, res) ->
 			ht = { req, res }
 
 			ego.log req.socket.address()
 
-			ego.send ht, 'var FindProxyForURL = ' + ego.opts.pac.toString()
+			reg_list = ''
+			for k, v of ego.opts.$
+				reg_list += k + ':' + v
+
+			data_list = ''
+			for k, v of ego.opts
+				if k[0] == '$' and k.length > 1
+					data_list += 'var ' + k + '=' + JSON.stringify(v) + ';'
+
+			ego.send ht, 'var $ = {' + reg_list + '};' +
+				data_list +
+				'var FindProxyForURL = ' + ego.opts.pac.toString()
 
 		send: (ht, body = '') ->
 			ht.res.writeHead 200, {
