@@ -1,0 +1,32 @@
+{
+  "name": "nopac",
+  "version": "0.0.1",
+  "description": "A proxy auto-configuration server.",
+  "main": "app.js",
+  "bin": {
+    "nopac": "app.js"
+  },
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ysmood/nopac.git"
+  },
+  "keywords": [
+    "pac",
+    "proxy",
+    "node"
+  ],
+  "author": "http://ysmood.org",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/ysmood/nopac/issues"
+  },
+  "homepage": "https://github.com/ysmood/nopac",
+  "dependencies": {
+    "coffee-script": "^1.7.1",
+    "glob": "^4.0.2",
+    "lodash": "^2.4.1"
+  }
+}
